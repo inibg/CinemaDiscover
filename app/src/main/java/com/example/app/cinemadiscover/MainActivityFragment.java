@@ -19,4 +19,11 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        FetchMoviesTask fmt = new FetchMoviesTask(getActivity());
+        fmt.execute(getString(R.string.order_top_rated));
+    }
 }
