@@ -5,12 +5,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by iberretta on 10/29/16.
@@ -97,7 +100,13 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
             }
         }
         MovieParser mp = new MovieParser(moviesJsonStr);
-        mp.parse();
+        List<Movie> movies = null;
+        try {
+           movies = mp.parse();
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        Log.v(LOG_TAG, " " + movies.size());
         return null;
     }
 }
