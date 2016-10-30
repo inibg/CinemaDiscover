@@ -51,54 +51,9 @@ public class GridMoviesAdapter extends BaseAdapter{
         if(convertView == null)
             vi = inflater.inflate(R.layout.grid_movies_item, null);
 
-        //TextView text=(TextView)vi.findViewById(R.id.text);;
         ImageView image = (ImageView)vi.findViewById(R.id.grid_item_image);
-        //text.setText("item "+position);
         imageLoader.DisplayImage(data[position], image);
         return vi;
     }
 
-
-   /*
-    private Context mContext;
-    private int layoutResourceId;
-    private ArrayList<Movie> mGridData = new ArrayList<>();
-
-    public GridMoviesAdapter(Context mContext, int layoutResourceId, ArrayList<Movie> mGridData) {
-        super(mContext, layoutResourceId, mGridData);
-        this.layoutResourceId = layoutResourceId;
-        this.mContext = mContext;
-        this.mGridData = mGridData;
-    }
-
-    public void setGridData(ArrayList<Movie> mGridData) {
-        this.mGridData = mGridData;
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        ViewHolder holder;
-
-        if (row == null) {
-            LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
-            holder = new ViewHolder();
-            holder.imageView = (ImageView) row.findViewById(R.id.grid_item_image);
-            row.setTag(holder);
-        } else {
-            holder = (ViewHolder) row.getTag();
-        }
-
-        Movie item = mGridData.get(position);
-        Picasso.with(mContext).load(item.getImage()).into(holder.imageView);
-        return row;
-    }
-
-    static class ViewHolder {
-        ImageView imageView;
-    }
-
-    */
 }

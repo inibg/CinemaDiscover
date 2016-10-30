@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
@@ -55,10 +56,11 @@ public class MainActivityFragment extends Fragment {
         mGridView = (GridView) getView().findViewById(R.id.grid_poster_view);
 
         FetchMoviesTask fmt = new FetchMoviesTask(getActivity());
-        fmt.execute(getString(R.string.order_top_rated));
+        fmt.execute(getString(R.string.order_top_rated), "1");
         mGridData = mMovies.toArray(new String[mMovies.size()]);
         mGridAdapter = new GridMoviesAdapter(getActivity(), mGridData);
         mGridView.setAdapter(mGridAdapter);
+        mGridView.setOnScrollListener(new EndlessScrollListener(10));
     }
 
     @Override
@@ -78,9 +80,11 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected Void doInBackground(String... params) {
-            if (params.length == 0)
+            if (params.length < 2)
                 return null;
             String order = params[0];
+            String page = params[1];
+
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -99,10 +103,12 @@ public class MainActivityFragment extends Fragment {
                 }
                 String KEY_PARAM = "api_key";
                 String LANGUAGE_PARAM = "language";
+                String PAGE_PARAM = "page";
 
                 Uri queryUri = Uri.parse(BASE_URL + SERVICE).buildUpon()
                         .appendQueryParameter(KEY_PARAM, BuildConfig.TMDB_API_KEY)
                         .appendQueryParameter(LANGUAGE_PARAM, "en-US")
+                        .appendQueryParameter(PAGE_PARAM, page)
                         .build();
                 URL url = new URL(queryUri.toString());
 
@@ -173,7 +179,49 @@ public class MainActivityFragment extends Fragment {
             while(it.hasNext()){
                 moviePostersURL.add(it.next().getImage().toString());
             }
-            mGridData = moviePostersURL.toArray(new String[moviePostersURL.size()]);
+            mGridData = Utils.concatStringsArrays(mGridData, moviePostersURL.toArray(new String[moviePostersURL.size()]));
+
         }
+
+
+    }
+
+    public class EndlessScrollListener implements AbsListView.OnScrollListener {
+
+        private int visibleThreshold = 5;
+        private int currentPage = 0;
+        private int previousTotal = 0;
+        private boolean loading = true;
+
+        public EndlessScrollListener() {
+        }
+
+        public EndlessScrollListener(int visibleThreshold) {
+            this.visibleThreshold = visibleThreshold;
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem,
+                             int visibleItemCount, int totalItemCount) {
+
+            if (loading) {
+                if (totalItemCount > previousTotal) {
+                    loading = false;
+                    previousTotal = totalItemCount;
+                    currentPage++;
+                }
+            }
+            if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+                Long page =  new Long(currentPage + 1);
+                new FetchMoviesTask(getActivity()).execute(getString(R.string.order_top_rated),
+                        page.toString());
+                loading = true;
+            }
+        }
+
     }
 }

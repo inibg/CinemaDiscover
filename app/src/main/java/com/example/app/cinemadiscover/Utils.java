@@ -23,4 +23,14 @@ public class Utils {
         }
         catch(Exception ex){}
     }
+
+    public static String[] concatStringsArrays(String[] arrayA, String[] arrayB){
+        int lengthA = arrayA.length;
+        int lengthB = arrayB.length;
+
+        String[] concatedArrays = new String[lengthA + lengthB];
+        System.arraycopy(arrayA, 0, concatedArrays, 0, lengthA);
+        System.arraycopy(arrayB, 0, concatedArrays, lengthA, lengthB);
+        return  concatedArrays;
+    }
 }
