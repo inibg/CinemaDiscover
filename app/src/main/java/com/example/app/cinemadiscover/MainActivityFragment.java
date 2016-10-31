@@ -2,6 +2,7 @@ package com.example.app.cinemadiscover;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
@@ -12,8 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -32,10 +34,10 @@ import java.util.List;
  */
 public class MainActivityFragment extends Fragment {
     private GridView mGridView;
-    private ProgressBar mProgressBar;
     private GridMoviesAdapter mGridAdapter;
     private List<Movie> mMovies = new ArrayList<>();
     private String[] mGridData;
+    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
     public MainActivityFragment() {
     }
@@ -61,6 +63,7 @@ public class MainActivityFragment extends Fragment {
         mGridAdapter = new GridMoviesAdapter(getActivity(), mGridData);
         mGridView.setAdapter(mGridAdapter);
         mGridView.setOnScrollListener(new EndlessScrollListener(10));
+        mGridView.setOnItemClickListener(new GridOnClickListener());
     }
 
     @Override
@@ -160,8 +163,14 @@ public class MainActivityFragment extends Fragment {
             }catch (JSONException e){
                 e.printStackTrace();
             }
-            Log.v(LOG_TAG, " " + movies.size());
-            mMovies = movies;
+            if (mMovies.size() == 0) {
+                mMovies = movies;
+            }else{
+                Iterator<Movie> it = movies.iterator();
+                while(it.hasNext()){
+                    mMovies.add(it.next());
+                }
+            }
             return null;
         }
 
@@ -174,19 +183,21 @@ public class MainActivityFragment extends Fragment {
         }
 
         private void loadGridData(){
+            if (mMovies == null)
+                return;
             Iterator<Movie> it = mMovies.iterator();
             List<String> moviePostersURL = new ArrayList<>();
             while(it.hasNext()){
                 moviePostersURL.add(it.next().getImage().toString());
             }
-            mGridData = Utils.concatStringsArrays(mGridData, moviePostersURL.toArray(new String[moviePostersURL.size()]));
+            mGridData = Utils.concatStringsArrays(new String[0], moviePostersURL.toArray(new String[moviePostersURL.size()]));
 
         }
 
 
     }
 
-    public class EndlessScrollListener implements AbsListView.OnScrollListener {
+    private class EndlessScrollListener implements AbsListView.OnScrollListener {
 
         private int visibleThreshold = 5;
         private int currentPage = 0;
@@ -223,5 +234,15 @@ public class MainActivityFragment extends Fragment {
             }
         }
 
+    }
+
+    private class GridOnClickListener implements  AbsListView.OnItemClickListener{
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Intent detailIntent;
+            Movie selectedMovie = mMovies.get(i);
+            Toast.makeText(getActivity(), selectedMovie.getName(), Toast.LENGTH_LONG).show();
+        }
     }
 }

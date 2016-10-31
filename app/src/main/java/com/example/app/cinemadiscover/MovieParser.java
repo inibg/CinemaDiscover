@@ -24,6 +24,7 @@ public class MovieParser {
         final String TMDB_MOVIE_LIST = "results";
         final String TMDB_MOVIE_POSTER = "poster_path";
         final String TMDB_MOVIE_ID = "id";
+        final String TMDB_MOVIE_NAME = "title";
         List<Movie> returnMovies = new ArrayList<>();
         JSONObject movies = new JSONObject(originalJsonData);
         JSONArray movies_list = movies.getJSONArray(TMDB_MOVIE_LIST);
@@ -33,7 +34,8 @@ public class MovieParser {
             JSONObject movie = movies_list.getJSONObject(i);
             String poster_path =  movie.getString(TMDB_MOVIE_POSTER);
             long id          = movie.getLong(TMDB_MOVIE_ID);
-            movieObject = new Movie(id,poster_path);
+            String name = movie.getString(TMDB_MOVIE_NAME);
+            movieObject = new Movie(id,poster_path, name);
             returnMovies.add(movieObject);
         }
 
