@@ -3,13 +3,18 @@ package com.example.app.cinemadiscover;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -35,41 +40,90 @@ import java.util.List;
 public class MainActivityFragment extends Fragment {
     private GridView mGridView;
     private GridMoviesAdapter mGridAdapter;
-    private List<Movie> mMovies = new ArrayList<>();
+    private List<Movie> mMovies;
     private String[] mGridData;
     private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
     public MainActivityFragment() {
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         inflater.inflate(R.layout.fragment_main, container, false);
-
         return inflater.inflate(R.layout.fragment_main, container, false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.menu_movie_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings){
+            Intent settingsIntent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(settingsIntent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Activity myActivity = getActivity();
 
-        mGridView = (GridView) getView().findViewById(R.id.grid_poster_view);
+
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
+    private void updateMovies(String pageNumber){
+        if (mGridView == null)
+            mGridView = (GridView) getView().findViewById(R.id.grid_poster_view);
 
         FetchMoviesTask fmt = new FetchMoviesTask(getActivity());
-        fmt.execute(getString(R.string.order_top_rated), "1");
-        mGridData = mMovies.toArray(new String[mMovies.size()]);
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(getActivity());
+
+        fmt.execute(preferences.getString(getString(R.string.pref_order_key),
+                getString(R.string.pref_order_default_order)), pageNumber);
+        if (mMovies == null || pageNumber.compareTo("1") == 0)
+            mMovies = new ArrayList<>();
+        mGridData = getMoviePosters();
+        //mGridData = mMovies.toArray(new String[mMovies.size()]);
         mGridAdapter = new GridMoviesAdapter(getActivity(), mGridData);
         mGridView.setAdapter(mGridAdapter);
         mGridView.setOnScrollListener(new EndlessScrollListener(10));
         mGridView.setOnItemClickListener(new GridOnClickListener());
     }
 
+    private String[] getMoviePosters(){
+        String[] posters = new String[mMovies.size()];
+        int i = 0;
+        for (Movie m: mMovies){
+            posters[i] = m.getImage().toString();
+            i++;
+        }
+        return posters;
+    }
     @Override
     public void onStart() {
         super.onStart();
 
+    }
+
+    @Override
+    public void onResume() {
+        updateMovies("1");
+        super.onResume();
     }
 
     private class FetchMoviesTask extends AsyncTask<String, Void, Void> {
@@ -99,7 +153,8 @@ public class MainActivityFragment extends Fragment {
             try {
                 String BASE_URL = "https://api.themoviedb.org/3/movie/";
                 String SERVICE;
-                if (order == context.getString(R.string.order_top_rated)){
+                String top_rated = context.getString(R.string.order_top_rated);
+                if (order.compareTo(top_rated) == 0){
                     SERVICE = "top_rated?";
                 }else{
                     SERVICE = "popular?";
@@ -228,8 +283,7 @@ public class MainActivityFragment extends Fragment {
             }
             if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
                 Long page =  new Long(currentPage + 1);
-                new FetchMoviesTask(getActivity()).execute(getString(R.string.order_top_rated),
-                        page.toString());
+                updateMovies(page.toString());
                 loading = true;
             }
         }
@@ -240,9 +294,11 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            Intent detailIntent;
+            Intent detailIntent = new Intent(getActivity(),MovieDetailActivity.class);
             Movie selectedMovie = mMovies.get(i);
-            Toast.makeText(getActivity(), selectedMovie.getName(), Toast.LENGTH_LONG).show();
+            detailIntent.putExtra("selectedMovie", selectedMovie);
+           // Toast.makeText(getActivity(), selectedMovie.getName(), Toast.LENGTH_LONG).show();
+            startActivity(detailIntent);
         }
     }
 }

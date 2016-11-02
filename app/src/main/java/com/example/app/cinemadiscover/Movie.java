@@ -2,11 +2,14 @@ package com.example.app.cinemadiscover;
 
 import android.net.Uri;
 
+import java.io.Serializable;
+
 /**
  * Created by iberretta on 10/29/16.
  */
 
-public class Movie {
+@SuppressWarnings("serial")
+public class Movie implements Serializable{
 
     private String mMoviePosterPath;
     private String mName;
@@ -25,5 +28,9 @@ public class Movie {
 
     public Uri getImage(){
         return Uri.parse(mMoviePosterPath).buildUpon().build();
+    }
+
+    public Long getId() {
+        return mId;
     }
 }

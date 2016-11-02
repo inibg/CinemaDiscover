@@ -11,13 +11,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="0dp"
-        android:columnWidth="190dp"
+        android:columnWidth="220dp"
         android:hapticFeedbackEnabled="true"
         android:drawSelectorOnTop="true"
         android:gravity="center"
-        android:numColumns="2"
-        android:stretchMode="columnWidth"
+        android:numColumns="3"
+        android:stretchMode="spacingWidth"
         android:verticalSpacing="0dp"
         android:focusable="true"
         android:clickable="true"/>
+
 </RelativeLayout>
