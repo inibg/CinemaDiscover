@@ -26,14 +26,23 @@ import java.util.concurrent.Executors;
  */
 public class ImageLoader {
 
-    MemoryCache memoryCache = new MemoryCache();
-    FileCache fileCache;
+    private static ImageLoader imgInstance;
+    private MemoryCache memoryCache = new MemoryCache();
+    private FileCache fileCache;
     private Map<ImageView, String> imageViews = Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
-    ExecutorService executorService;
-    Handler handler=new Handler();//handler to display images in UI thread
+    private ExecutorService executorService;
+    private Handler handler=new Handler();//handler to display images in UI thread
     final int stub_id = R.drawable.default_poster;
 
-    public ImageLoader(Context context){
+    private ImageLoader(){}
+
+    public static ImageLoader getInstance(Context context){
+        if (imgInstance == null){
+            imgInstance = new ImageLoader(context);
+        }
+        return imgInstance;
+    }
+    private ImageLoader(Context context){
         fileCache = new FileCache(context);
         executorService = Executors.newFixedThreadPool(5);
     }

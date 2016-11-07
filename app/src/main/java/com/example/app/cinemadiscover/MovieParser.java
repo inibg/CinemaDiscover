@@ -25,6 +25,9 @@ public class MovieParser {
         final String TMDB_MOVIE_POSTER = "poster_path";
         final String TMDB_MOVIE_ID = "id";
         final String TMDB_MOVIE_NAME = "title";
+        final String TMDB_MOVIE_SYNOPSIS = "overview";
+        final String TMDB_MOVIE_RATING = "vote_average";
+
         List<Movie> returnMovies = new ArrayList<>();
         JSONObject movies = new JSONObject(originalJsonData);
         JSONArray movies_list = movies.getJSONArray(TMDB_MOVIE_LIST);
@@ -35,7 +38,9 @@ public class MovieParser {
             String poster_path =  movie.getString(TMDB_MOVIE_POSTER);
             long id          = movie.getLong(TMDB_MOVIE_ID);
             String name = movie.getString(TMDB_MOVIE_NAME);
-            movieObject = new Movie(id,poster_path, name);
+            String synopsis = movie.getString(TMDB_MOVIE_SYNOPSIS);
+            long rating = movie.getLong(TMDB_MOVIE_RATING);
+            movieObject = new Movie(id,poster_path, name, synopsis, rating);
             returnMovies.add(movieObject);
         }
 

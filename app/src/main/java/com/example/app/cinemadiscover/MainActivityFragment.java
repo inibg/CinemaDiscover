@@ -98,7 +98,6 @@ public class MainActivityFragment extends Fragment {
         if (mMovies == null || pageNumber.compareTo("1") == 0)
             mMovies = new ArrayList<>();
         mGridData = getMoviePosters();
-        //mGridData = mMovies.toArray(new String[mMovies.size()]);
         mGridAdapter = new GridMoviesAdapter(getActivity(), mGridData);
         mGridView.setAdapter(mGridAdapter);
         mGridView.setOnScrollListener(new EndlessScrollListener(10));
@@ -296,8 +295,8 @@ public class MainActivityFragment extends Fragment {
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             Intent detailIntent = new Intent(getActivity(),MovieDetailActivity.class);
             Movie selectedMovie = mMovies.get(i);
+            detailIntent.putExtra("moviePoster", mGridData[i]);
             detailIntent.putExtra("selectedMovie", selectedMovie);
-           // Toast.makeText(getActivity(), selectedMovie.getName(), Toast.LENGTH_LONG).show();
             startActivity(detailIntent);
         }
     }

@@ -23,7 +23,7 @@ public class GridMoviesAdapter extends BaseAdapter{
         activity = a;
         data = d;
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        imageLoader = new ImageLoader(activity.getApplicationContext());
+        imageLoader = ImageLoader.getInstance(a);
     }
 
     public void updateData(String[] newContent){
